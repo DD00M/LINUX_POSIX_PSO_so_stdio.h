@@ -12,15 +12,12 @@
 SO_FILE *so_popen(const char *command, const char *type)
 {
     printf("aici odtx\n");
+
+    int status;
+
     int pipe_fd[2];
     int ret = pipe(pipe_fd);
     printf("%d %d\n", pipe_fd[0], pipe_fd[1]);
-    int op = dup2(pipe_fd[1], 1);
-    printf("%d\n", op);
-    if (op < 0){
-        perror("err dup2 STDOUT\n");
-        exit(-1);
-    }
     if (ret < 0)
     {
         perror("error at creating pipe\n");
@@ -28,12 +25,18 @@ SO_FILE *so_popen(const char *command, const char *type)
     }
     printf("aici odt2\n");
     int pid = fork();
-    printf("aici odt\n");
+    printf("aici odt3\n");
     if (pid == 0)
     {
+        printf("aici odt4\n");
+        int op = dup2(pipe_fd[1], 1);
+        if (op < 0){
+            perror("err dup2 STDOUT\n");
+            exit(-1);
+        }
         if (strcmp(type , "r") == 0)
-        {
-            printf("ceva\n");
+        {   
+            //printf("ceva\n");
             close(pipe_fd[0]);
             execl("/bin/sh", "sh", "-c", command, (char *)0);
             SO_FILE *file = (SO_FILE *)malloc(sizeof(SO_FILE));
@@ -65,7 +68,7 @@ SO_FILE *so_popen(const char *command, const char *type)
     }
     else if (pid > 0)
     {
-        waitpid(pid);
+        waitpid(pid, &status, 0);
     }
     else if (pid < 0)
     {
