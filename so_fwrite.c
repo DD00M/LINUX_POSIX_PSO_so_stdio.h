@@ -11,6 +11,9 @@
 
 size_t so_fwrite(const void *ptr, size_t size, size_t nmemb, SO_FILE *stream)
 {
+    if (strcmp(stream->mode, "r") == 0){
+        return SO_EOF;
+    }
     if (nmemb <= 0 || size <= 0)
     {
         perror("invalid nmemb or size\n");
@@ -36,8 +39,6 @@ size_t so_fwrite(const void *ptr, size_t size, size_t nmemb, SO_FILE *stream)
             {
                 for (int i = t; i < size; i++)
                 {
-                    //printf("a intrat\n");
-                    //printf("lalalalal: %c\n", aux[i]);
                     if(stream->buffer_index == BUFSIZE){
                         i--;
                     }
@@ -46,7 +47,6 @@ size_t so_fwrite(const void *ptr, size_t size, size_t nmemb, SO_FILE *stream)
                 t = i;
             }
             stream->prev = WRITEprev;
-            printf("%s\n", stream->buffer);
             return size * nmemb;
         }
     }

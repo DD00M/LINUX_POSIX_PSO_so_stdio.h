@@ -57,6 +57,11 @@ typedef struct _so_file{
     long cursor;
 
     int prev;
+
+    int pid;
+    int ppid;
+
+    int is_p;
 } SO_FILE;
 
 FUNC_DECL_PREFIX SO_FILE *so_fopen(const char *pathname, const char *mode);

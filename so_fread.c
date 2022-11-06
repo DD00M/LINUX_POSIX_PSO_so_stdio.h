@@ -8,12 +8,13 @@
 #include "so_stdio.h"
 
 size_t so_fread(void *ptr, size_t size, size_t nmemb, SO_FILE *stream){
+    if (strcmp(stream->mode, "w") == 0){
+        return SO_EOF;
+    }    
     if (nmemb <= 0 || size <= 0){
-        perror("invalid nmemb or size\n");
         return 0;
     }else{
         if (stream == NULL){
-            perror("bad stream\n");
             return 0;
         }else{
             int t = 0;
@@ -23,12 +24,9 @@ size_t so_fread(void *ptr, size_t size, size_t nmemb, SO_FILE *stream){
                 for (i = t; i < size; i++){
                     int k = so_fgetc(stream);
                     aux[i] = (char)k;
-                    printf("%c\n", aux[i]);
                 }
                 t = i;
             }
-            printf("\n%s", aux);
-            printf("\n%s", ptr);
             stream->read_flag = 1;
             stream->prev = READprev;
             return size*nmemb;

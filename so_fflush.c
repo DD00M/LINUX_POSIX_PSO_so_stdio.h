@@ -11,13 +11,13 @@
 
 int so_fflush(SO_FILE *stream)
 {
-    printf("a intrat in fflush\n");
     if (stream->off_written != 0)
     {
-        //printf("a intrat in if\n");
-        //printf("%s\n", stream->buffer);
-        //printf("%d\n", stream->off_written);
-        write(stream->so_fd, stream->buffer, BUFSIZE);
+        int d = write(stream->so_fd, stream->buffer, BUFSIZE);
+        if (d < 0){
+            perror("fflush failed\n");
+            return SO_EOF;
+        }
         stream->off_written = 0;
         return 0;
     }else{

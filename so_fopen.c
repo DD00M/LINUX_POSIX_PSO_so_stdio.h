@@ -5,6 +5,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/errno.h>
 #include "so_stdio.h"
 
 //#include <stdio.h>
