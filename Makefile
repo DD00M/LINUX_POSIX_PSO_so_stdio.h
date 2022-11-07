@@ -1,4 +1,4 @@
-.PHONY: clean
+.PHONY: clean build
 so_fopen.o: so_fopen.c
 	gcc -fPIC -c so_fopen.c -o so_fopen.o
 so_fclose.o: so_fclose.c
@@ -25,10 +25,14 @@ so_fseek.o: so_fseek.c
 	gcc -fPIC -c so_fseek.c -o so_fseek.o
 so_popen.o: so_popen.c
 	gcc -fPIC -c so_popen.c -o so_popen.o
-libso_stdio.so: so_fopen.o so_fclose.o so_fputc.o so_fgetc.o so_fileno.o so_fflush.o so_feof.o so_ferror.o so_ftell.o so_fread.o so_fwrite.o so_popen.o so_fseek.o
-	gcc -shared so_fopen.o so_fclose.o so_fputc.o so_fgetc.o so_fileno.o so_fflush.o so_feof.o so_ferror.o so_ftell.o so_fread.o so_fwrite.o so_popen.o so_fseek.o -o libso_stdio.so
+so_pclose.o: so_pclose.c
+	gcc -fPIC -c so_pclose.c -o so_pclose.o
+libso_stdio.so: so_fopen.o so_fclose.o so_fputc.o so_fgetc.o so_fileno.o so_fflush.o so_feof.o so_ferror.o so_ftell.o so_fread.o so_fwrite.o so_popen.o so_fseek.o so_pclose.o
+	gcc -shared so_fopen.o so_fclose.o so_fputc.o so_fgetc.o so_fileno.o so_fflush.o so_feof.o so_ferror.o so_ftell.o so_fread.o so_fwrite.o so_popen.o so_fseek.o so_pclose.o -o libso_stdio.so
 main: main.c libso_stdio.so
 	gcc main.c -o main -l so_stdio -L .
 	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:.
+build: so_fopen.o so_fclose.o so_fputc.o so_fgetc.o so_fileno.o so_fflush.o so_feof.o so_ferror.o so_ftell.o so_fread.o so_fwrite.o so_popen.o so_fseek.o so_pclose.o
+	gcc -shared so_fopen.o so_fclose.o so_fputc.o so_fgetc.o so_fileno.o so_fflush.o so_feof.o so_ferror.o so_ftell.o so_fread.o so_fwrite.o so_popen.o so_fseek.o so_pclose.o -o libso_stdio.so
 clean: 
-	rm libso_stdio.so so_fopen.o so_fclose.o so_feof.o so_ferror.o so_fflush.o so_fgetc.o so_fileno.o so_fputc.o so_ftell.o so_fwrite.o so_popen.o so_fseek.o main
+	rm libso_stdio.so so_fopen.o so_fclose.o so_feof.o so_ferror.o so_fflush.o so_fgetc.o so_fileno.o so_fputc.o so_ftell.o so_fwrite.o so_popen.o so_fseek.o so_fread.o so_pclose.o main

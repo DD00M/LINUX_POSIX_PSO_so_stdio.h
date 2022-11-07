@@ -35,7 +35,7 @@
 
 struct _so_file;
 
-#define BUFSIZE 4
+#define BUFSIZE 4096
 
 typedef struct _so_file{
     int so_start_offset;
@@ -62,6 +62,7 @@ typedef struct _so_file{
     int ppid;
 
     int is_p;
+    int childFlag;
 } SO_FILE;
 
 FUNC_DECL_PREFIX SO_FILE *so_fopen(const char *pathname, const char *mode);
