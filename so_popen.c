@@ -10,49 +10,57 @@
 
 #include <stdio.h>
 
+#define READ_END 0
+#define WRITE_END 1
+
 SO_FILE *so_popen(const char *command, const char *type)
 {
     int status;
-    int flag = 0;
     int myfd;
 
     int pipe_fd[2];
     int ret = pipe(pipe_fd);
-    printf("%d %d\n", pipe_fd[0], pipe_fd[1]);
+    //printf("%d %d\n", pipe_fd[READ_END], pipe_fd[WRITE_END]);
     if (ret < 0)
     {
         perror("error at creating pipe\n");
         exit(-1);
     }
-    printf("FLAG1\n");
-    int pid = fork();
+    //printf("FLAG1\n");
+
+     if (strcmp(type, "r") == 0){
+        myfd = pipe_fd[READ_END];
+    }else if (strcmp(type, "w") == 0){
+        myfd = pipe_fd[WRITE_END];
+    }
+
+
+    int pid = fork();  
     if (pid == 0)
     {
         if (strcmp(type, "r") == 0)
         {
-            printf("FLAG2\n");
-            myfd = pipe_fd[1];
-            int op = dup2(pipe_fd[1], STDOUT_FILENO);
+            
+            int op = dup2(pipe_fd[WRITE_END], 1);
             if (op < 0)
             {
                 perror("err dup2 STDOUT\n");
                 exit(-1);
             }
-            close(pipe_fd[0]);
-            flag = 1;
-            execlp("/bin/sh", "sh", "-c", command, (char *)0);
+            close(pipe_fd[READ_END]);
+            
+            execlp(command, NULL);
         }
         else if (strcmp(type, "w") == 0)
         {
-            myfd = pipe_fd[0];
-            int op = dup2(pipe_fd[0], 0);
+            int op = dup2(pipe_fd[WRITE_END], 1);
             if (op < 0)
             {
                 perror("err dup2 STDOUT\n");
                 exit(-1);
             }
-            close(pipe_fd[1]);
-            execlp("/bin/sh", "sh", "-c", command, (char *)0);
+            close(pipe_fd[READ_END]);
+            execlp(command, NULL);
         }
         else
         {
@@ -61,15 +69,16 @@ SO_FILE *so_popen(const char *command, const char *type)
     }
     else if (pid > 0)
     {
-    }
-    if (flag == 1){
-        printf("aicisea\n");
+        //printf("A INTRAT AICI\n");
         SO_FILE *file = (SO_FILE *)malloc(sizeof(SO_FILE));
+        file->buffer = (char*)malloc(BUFSIZE*sizeof(char));
+        file->buffer_index = 0;
+        file->off_written = 0;
+        file->cursor = 0;
         file->so_fd = myfd;
-        file->mode = type;
+        file->mode=strdup(type);
         file->pid = pid;
         file->is_p = 1;
         return file;
     }
-    printf("iese\n");
 }

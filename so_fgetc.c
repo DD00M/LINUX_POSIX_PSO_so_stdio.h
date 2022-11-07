@@ -14,6 +14,7 @@ int so_fgetc(SO_FILE *stream)
     if (strcmp(stream->mode, "w") == 0){
         return SO_EOF;
     }
+    //printf("%d %d\n", stream->firstIndex, stream->lastIndex);
     if (stream->firstIndex == stream->lastIndex)
     {
         //printf("fgetc\n");

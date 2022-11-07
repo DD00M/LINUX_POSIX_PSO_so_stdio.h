@@ -7,7 +7,7 @@
 int main(){
     int ch;
 
-    SO_FILE*p = so_popen("ls", "r");
+    SO_FILE*p = so_popen("pwd", "r");
     //SO_FILE*file = so_fopesn("out.txt", "r");
 
     //p//rintf("%d", (int)so_fwrite("ana are mere", 13, 1, file));
