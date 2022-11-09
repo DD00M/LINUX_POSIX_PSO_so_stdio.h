@@ -16,7 +16,7 @@ size_t so_fwrite(const void *ptr, size_t size, size_t nmemb, SO_FILE *stream)
     }
     if (nmemb <= 0 || size <= 0)
     {
-        perror("invalid nmemb or size\n");
+        stream->isERR = 555;
         return 0; 
     }
     else
@@ -27,27 +27,22 @@ size_t so_fwrite(const void *ptr, size_t size, size_t nmemb, SO_FILE *stream)
         }
         if (stream == NULL)
         {
-            perror("bad stream\n");
+            stream->isERR = 555;
             return 0;
         }
         else
         {
             char *aux = (char *)ptr;
-            int t = 0;
-            int i = 0;
-            for (int j = 0; j < nmemb; j++)
-            {
-                for (int i = t; i < size; i++)
-                {
-                    if(stream->buffer_index == BUFSIZE){
-                        i--;
-                    }
-                    so_fputc((int)aux[i], stream);
-                }
-                t = i;
+
+            for (int i = 0; i < size * nmemb; i++){
+                so_fputc((int)aux[i], stream);
             }
+
             stream->prev = WRITEprev;
+            stream->isERR = 888;
             return size * nmemb;
         }
     }
+    stream->isERR = 555;
+    return SO_EOF;
 }

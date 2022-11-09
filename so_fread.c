@@ -19,24 +19,25 @@ size_t so_fread(void *ptr, size_t size, size_t nmemb, SO_FILE *stream){
             return 0;
         }else{
             //printf("a intrat si aici1\n");  
-            int t = 0;
-            int i = 0;
             char *aux = (char*)ptr;
-            //printf("%d %d\n", nmemb, size);
-            for (int j = 0; j < nmemb; j++){
-                //printf("%d\n", t);
-                for (i = t; i < size; i++){  
-                    int k = so_fgetc(stream);
-                    //printf("char: %c", k);
-                    aux[i] = (char)k;
-                }
-                t = i;
+            //printf("nmemb, size: %d %d\n", nmemb, size);
+
+            int z = 0;
+
+            if (size * nmemb > stream->so_sizeFile){
+                z = stream->so_sizeFile;
+            }else z = size * nmemb;
+
+            for (int i = 0; i < size * nmemb; i++){ 
+                int k = so_fgetc(stream);
+                aux[i] = (char)k;
             }
             //printf("a intrat si aici4\n");  
             stream->read_flag = 1;
             stream->prev = READprev;
             //printf("a intrat si aici3\n");  
-            return size*nmemb;
+            //printf("XXXXXXX: %d\n", size*nmemb);
+            return z;
         }
     }
 }

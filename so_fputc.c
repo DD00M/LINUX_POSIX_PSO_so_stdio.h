@@ -14,22 +14,27 @@ int so_fputc(int c, SO_FILE *stream)
     if (strcmp(stream->mode, "r") == 0){
         return SO_EOF;
     }
-
-    if (stream->buffer_index < BUFSIZE){
-        stream->buffer[stream->buffer_index] = (char)c;
-        stream->buffer_index += 1;
-        stream->off_written += 1;
-        stream->cursor += 1;
-        return c;
-    }else{
-        stream->buffer[BUFSIZE] = '\0';
-        int check = write(stream->so_fd, stream->buffer, BUFSIZE);
-        if (check <= 0){
-            return SO_EOF;
-        }
-        stream->buffer_index = 0;
-        stream->off_written += BUFSIZE;
-        stream->cursor += 1;
-        return c;
+    if (strcmp(stream->mode, "a") == 0 || strcmp(stream->mode, "a+") == 0){
+        lseek(stream->so_fd, 0, SEEK_END);
     }
+    if (stream->prev == READprev){
+        stream->buffer_index = 0;
+        stream->off_written = 0;
+        for (int i = 0; i < BUFSIZE; i++){
+            stream->buffer[i] = '\0';
+        }
+    }
+
+    stream->prev = WRITEprev;
+
+    if (stream->off_written == BUFSIZE){
+        so_fflush(stream);
+    }
+
+    stream->buffer[stream->buffer_index] = (int)c;
+
+    stream->off_written+=1;
+    stream->buffer_index+=1;   
+    stream->cursor+=1; 
+    return c;
 }

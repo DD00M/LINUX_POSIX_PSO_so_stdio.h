@@ -11,16 +11,30 @@
 
 int so_fflush(SO_FILE *stream)
 {
-    if (stream->off_written != 0)
+    if (stream->prev == WRITEprev)
     {
-        int d = write(stream->so_fd, stream->buffer, BUFSIZE);
-        if (d < 0){
-            perror("fflush failed\n");
-            return SO_EOF;
-        }
-        stream->off_written = 0;
-        return 0;
-    }else{
+        if (stream->off_written != 0)
+        {
+            int d = write(stream->so_fd, stream->buffer, stream->off_written);
+            if (d < 0)
+            {
+                stream->isERR = 555;
+                return SO_EOF;
+            }
+            stream->buffer_index = 0;
+            stream->off_written = 0;
+            // memset(stream->buffer, 0, BUFSIZE);
+            for (int i = 0; i < BUFSIZE; i++)
+            {
+                stream->buffer[i] = '\0';
+            }
+            stream->isERR = 888;
+            return 0;
+        }return SO_EOF;
+    }
+    else
+    {
+        stream->isERR = 555;
         return SO_EOF;
     }
 }

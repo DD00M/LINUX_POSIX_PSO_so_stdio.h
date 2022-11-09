@@ -14,5 +14,10 @@ int so_ferror(SO_FILE *stream)
     {
         return 444;
     }
+    else if (stream->isERR == 555){
+        return -1;
+    }else if (stream->isERR == 888){
+        return 1;
+    }
     return SO_EOF;
 }

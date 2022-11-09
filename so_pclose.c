@@ -9,7 +9,7 @@
 #include "so_stdio.h"
 
 #include <stdio.h>
-
+    
 int so_pclose(SO_FILE* stream){
     if (stream->is_p == 1){
     int stat;

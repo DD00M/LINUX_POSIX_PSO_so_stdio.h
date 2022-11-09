@@ -71,12 +71,11 @@ SO_FILE *so_popen(const char *command, const char *type)
     {
         //printf("A INTRAT AICI\n");
         SO_FILE *file = (SO_FILE *)malloc(sizeof(SO_FILE));
-        file->buffer = (char*)malloc(BUFSIZE*sizeof(char));
         file->buffer_index = 0;
         file->off_written = 0;
         file->cursor = 0;
         file->so_fd = myfd;
-        file->mode=strdup(type);
+        strcpy(file->mode, type);
         file->pid = pid;
         file->is_p = 1;
         return file;
