@@ -9,22 +9,21 @@
 
 int so_fclose(SO_FILE *stream)
 {
-    if (stream != NULL)
+    if (stream == NULL){
+        return SO_EOF;
+    }
+
+    if (stream->is_file == 0){
+        return SO_EOF;
+    }
+
+    so_fflush(stream);
+    int k = close(stream->so_fd);
+    if (k == -1)
     {
-        if (stream->prev == WRITEprev){
-            //printf("fflush start\n");
-            so_fflush(stream);
-            //printf("fflush end\n");
-        }
-        //printf("fd: %d\n", stream->so_fd);
-        int k = close(stream->so_fd);
-        if (k == -1){
-            //stream->isERR = 555;
-            free(stream);
-            return  SO_EOF;
-        }
-        //stream->isERR = 555;
         free(stream);
-        return 0;
-    }else {return SO_EOF; }//stream->isERR = 555;}
+        return SO_EOF;
+    }
+    free(stream);
+    return 0;
 }

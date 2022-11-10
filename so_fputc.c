@@ -20,9 +20,7 @@ int so_fputc(int c, SO_FILE *stream)
     if (stream->prev == READprev){
         stream->buffer_index = 0;
         stream->off_written = 0;
-        for (int i = 0; i < BUFSIZE; i++){
-            stream->buffer[i] = '\0';
-        }
+        memset(stream->buffer, 0, BUFSIZE);
     }
 
     stream->prev = WRITEprev;

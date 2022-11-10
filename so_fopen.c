@@ -40,6 +40,7 @@ SO_FILE *so_fopen(const char *pathname, const char *mode)
         else
         {
             fp->buffer_index = 0;
+            fp->is_file = 1;
             fp->so_fd = fd;
             fp->off_written = 0;
             fp->cursor = 0;
@@ -56,6 +57,8 @@ SO_FILE *so_fopen(const char *pathname, const char *mode)
             fp->prev = 0;
             fp->read_flag = 0;
             fp->so_start_offset = 0;
+            fp->flagERR = 0;
+
             //int position = fseek(fd, 0, SEEK_SET);
 
             //fp->so_start_offset = position;
@@ -68,9 +71,9 @@ SO_FILE *so_fopen(const char *pathname, const char *mode)
     else if (strcmp(mode, "r+") == 0)
     {
         SO_FILE *fp;
+        fp = (SO_FILE *)malloc(sizeof(SO_FILE));
         struct stat st;
         stat(pathname, &st);
-        fp = (SO_FILE *)malloc(sizeof(SO_FILE));
         fp->so_sizeFile = st.st_size;
         fp->firstIndex = 0;
         fp->buffer_index = 0;
@@ -90,6 +93,7 @@ SO_FILE *so_fopen(const char *pathname, const char *mode)
             strcpy(fp->mode, "r+");
             fp->so_fd = fd;
             fp->cursor = 0;
+            fp->is_file = 1;
             //int position = fseek(fd, 0, SEEK_SET);
             //fp->so_start_offset = position;
             fp->firstIndex = 0;
@@ -106,6 +110,9 @@ SO_FILE *so_fopen(const char *pathname, const char *mode)
             fp->prev = 0;
             fp->read_flag = 0;
             fp->so_start_offset = 0;
+            fp->flagERR = 0;
+            fp->eof = 0;
+
             return fp;
         }
     }
@@ -113,7 +120,6 @@ SO_FILE *so_fopen(const char *pathname, const char *mode)
     {
         SO_FILE *fp;
         fp = (SO_FILE *)malloc(sizeof(SO_FILE));
-        
         // write(1, "FLAG3\n", 7);
         struct stat st;
         stat(pathname, &st);
@@ -134,12 +140,14 @@ SO_FILE *so_fopen(const char *pathname, const char *mode)
             else
             {
                 strcpy(fp->mode, "w");
+                fp->cursor = 0;
                 //memset(fp->buffer, 0, BUFSIZE);
                 fp->bufsizeIndex = 0;
                 fp->so_fd = fd;
                 fp->firstIndex = 0;
                 fp->lastIndex = 0;
                 fp->childFlag = 0;
+                fp->is_file = 1;
                 fp->currentBufSize = 0;
                 fp->is_p = 0;
                 fp->isERR = 0;
@@ -151,6 +159,8 @@ SO_FILE *so_fopen(const char *pathname, const char *mode)
                 fp->prev = 0;
                 fp->read_flag = 0;
                 fp->so_start_offset = 0;
+                fp->flagERR = 0;
+                fp->eof = 0;
                 //int position = fseek(fd, 0, SEEK_SET);
                 //fp->so_start_offset = position;
                 return fp;
@@ -158,7 +168,7 @@ SO_FILE *so_fopen(const char *pathname, const char *mode)
         }
         else
         {
-            int fd = open(pathname, O_WRONLY | O_CREAT, 0777);
+            int fd = open(pathname, O_WRONLY | O_CREAT, 0644);
             if (fd == -1)
             {
                 free(fp);
@@ -171,6 +181,7 @@ SO_FILE *so_fopen(const char *pathname, const char *mode)
                 strcpy(fp->mode, "w");
                 fp->bufsizeIndex = 0;
                 fp->so_fd = fd;
+                fp->is_file = 1;
                 fp->cursor = 0;
                 fp->firstIndex = 0;
                 fp->lastIndex = 0;
@@ -186,6 +197,9 @@ SO_FILE *so_fopen(const char *pathname, const char *mode)
                 fp->prev = 0;
                 fp->read_flag = 0;
                 fp->so_start_offset = 0;
+                fp->flagERR = 0;
+                fp->eof = 0;
+
                 return fp;
             }
         }
@@ -222,6 +236,7 @@ SO_FILE *so_fopen(const char *pathname, const char *mode)
                 fp->currentBufSize = 0;
                 fp->is_p = 0;
                 fp->isERR = 0;
+                fp->is_file = 1;
                 fp->bufsizeIndex = 0;
                 fp->off_read = 0;
                 fp->off_written = 0;
@@ -230,12 +245,15 @@ SO_FILE *so_fopen(const char *pathname, const char *mode)
                 fp->prev = 0;
                 fp->read_flag = 0;
                 fp->so_start_offset = 0;
+                fp->flagERR = 0;
+                fp->eof = 0;
+
                 return fp;
             }
         }
         else
         {
-            int fd = open(pathname, O_RDWR | O_CREAT, 0777);
+            int fd = open(pathname, O_RDWR | O_CREAT, 0644);
             if (fd == -1)
             {
                 free(fp);
@@ -250,6 +268,7 @@ SO_FILE *so_fopen(const char *pathname, const char *mode)
                 fp->cursor = 0;
                 //int position = fseek(fd, 0, SEEK_SET);
                 fp->firstIndex = 0;
+                fp->is_file = 1;
                 fp->lastIndex = 0;
                 fp->childFlag = 0;
                 fp->currentBufSize = 0;
@@ -263,6 +282,8 @@ SO_FILE *so_fopen(const char *pathname, const char *mode)
                 fp->prev = 0;
                 fp->read_flag = 0;
                 fp->so_start_offset = 0;
+                fp->flagERR = 0;
+                fp->eof = 0;
                 return fp;
             }
         }
@@ -299,21 +320,24 @@ SO_FILE *so_fopen(const char *pathname, const char *mode)
                 fp->childFlag = 0;
                 fp->currentBufSize = 0;
                 fp->is_p = 0;
+                fp->is_file = 1;
                 fp->isERR = 0;
                 fp->off_read = 0;
                 fp->off_written = 0;
+                fp->flagERR = 0;
                 fp->pid = 0;
                 fp->ppid = 0;
                 fp->prev = 0;
                 fp->read_flag = 0;
                 fp->so_start_offset = 0;
                 fp->bufsizeIndex = 0;
+                fp->eof = 0;
                 return fp;
             }
         }
         else
         {
-            int fd = open(pathname, O_APPEND | O_WRONLY | O_CREAT, 0777);
+            int fd = open(pathname, O_APPEND | O_WRONLY | O_CREAT, 0644);
             if (fd == -1)
             {
                 free(fp);
@@ -333,15 +357,19 @@ SO_FILE *so_fopen(const char *pathname, const char *mode)
                 fp->lastIndex = 0;
                 fp->childFlag = 0;
                 fp->currentBufSize = 0;
+                fp->is_file = 1;
                 fp->is_p = 0;
                 fp->isERR = 0;
                 fp->off_read = 0;
                 fp->off_written = 0;
                 fp->pid = 0;
+                fp->eof = 0;
                 fp->ppid = 0;
+                fp->flagERR = 0;
                 fp->prev = 0;
                 fp->read_flag = 0;
                 fp->so_start_offset = 0;
+
                 return fp;
             }
         }
@@ -370,11 +398,13 @@ SO_FILE *so_fopen(const char *pathname, const char *mode)
                 strcpy(fp->mode, "a+");
                 fp->off_written = 0;
                 fp->so_fd = fd;
+                fp->is_file = 1;
                 fp->firstIndex = 0;
                 fp->lastIndex = 0;
                 fp->childFlag = 0;
                 fp->currentBufSize = 0;
                 fp->is_p = 0;
+                fp->eof = 0;
                 fp->isERR = 0;
                 fp->off_read = 0;
                 fp->off_written = 0;
@@ -384,7 +414,9 @@ SO_FILE *so_fopen(const char *pathname, const char *mode)
                 fp->prev = 0;
                 fp->read_flag = 0;
                 fp->so_start_offset = 0;
+                fp->flagERR = 0;
                 fp->cursor = 0;
+
                 //int position = fseek(fd, 0, SEEK_SET);
                 //fp->so_start_offset = position;
                 return fp;
@@ -392,7 +424,7 @@ SO_FILE *so_fopen(const char *pathname, const char *mode)
         }
         else
         {
-            int fd = open(pathname, O_APPEND | O_CREAT, 0777);
+            int fd = open(pathname, O_APPEND | O_CREAT, 0644);
             if (fd == -1)
             {
                 free(fp);
@@ -410,10 +442,13 @@ SO_FILE *so_fopen(const char *pathname, const char *mode)
                 fp->currentBufSize = 0;
                 fp->is_p = 0;
                 fp->isERR = 0;
+                fp->is_file = 1;
                 fp->off_read = 0;
                 fp->off_written = 0;
                 fp->pid = 0;
+                fp->flagERR = 0;
                 fp->ppid = 0;
+                fp->eof = 0;
                 fp->prev = 0;
                 fp->read_flag = 0;
                 fp->so_start_offset = 0;    
@@ -424,5 +459,7 @@ SO_FILE *so_fopen(const char *pathname, const char *mode)
                 return fp;
             }
         }
-    }else return NULL;
+    }else{ 
+        return NULL;
+    }
 }

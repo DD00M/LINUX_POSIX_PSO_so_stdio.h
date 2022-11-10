@@ -28,12 +28,20 @@ int so_fflush(SO_FILE *stream)
             {
                 stream->buffer[i] = '\0';
             }
-            stream->isERR = 888;
+            stream->isERR = 999;
             return 0;
         }return SO_EOF;
     }
     else
     {
+        stream->buffer_index = 0;
+        stream->off_written = 0;
+            // memset(stream->buffer, 0, BUFSIZE);
+        for (int i = 0; i < BUFSIZE; i++)
+        {
+            stream->buffer[i] = '\0';
+        }
+
         stream->isERR = 555;
         return SO_EOF;
     }

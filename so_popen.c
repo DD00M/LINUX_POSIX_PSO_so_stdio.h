@@ -15,8 +15,8 @@
 
 SO_FILE *so_popen(const char *command, const char *type)
 {
-    int status;
-    int myfd;
+    int status = 0;
+    int myfd = 0;
 
     int pipe_fd[2];
     int ret = pipe(pipe_fd);
@@ -75,9 +75,45 @@ SO_FILE *so_popen(const char *command, const char *type)
         file->off_written = 0;
         file->cursor = 0;
         file->so_fd = myfd;
+        file->firstIndex = 0;
+        file->lastIndex = 0;
+        file->childFlag = 0;        
         strcpy(file->mode, type);
         file->pid = pid;
         file->is_p = 1;
+        file->ppid = 0;
+        file->prev = 0;
+        file->read_flag = 0;
+        file->so_start_offset = 0;
+        file->bufsizeIndex = 0;
+        file->eof = 0;
+        file->is_file = 0;
+        file->isERR = 0;
+        file->off_read = 0;
+        file->flagERR = 0;
         return file;
     }
 }
+
+/*              strcpy(fp->mode, "a");
+                fp->so_fd = fd;
+                fp->cursor = 0;
+                //int position = fseek(fd, 0, SEEK_SET);
+                //fp->so_start_offset = position;
+                fp->firstIndex = 0;
+                fp->lastIndex = 0;
+                fp->childFlag = 0;
+                fp->currentBufSize = 0;
+                fp->is_p = 0;
+                fp->is_file = 1;
+                fp->isERR = 0;
+                fp->off_read = 0;
+                fp->off_written = 0;
+                fp->flagERR = 0;
+                fp->pid = 0;
+                fp->ppid = 0;
+                fp->prev = 0;
+                fp->read_flag = 0;
+                fp->so_start_offset = 0;
+                fp->bufsizeIndex = 0;
+                fp->eof = 0;*/
