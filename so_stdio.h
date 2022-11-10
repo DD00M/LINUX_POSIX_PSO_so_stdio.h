@@ -41,8 +41,8 @@ typedef struct _so_file{
     int so_start_offset;
     int so_fd;
     int so_sizeFile;
-    char *mode;
-    char *buffer;
+    char mode[2];
+    char buffer[BUFSIZE];
     char currentBufSize;
     int buffer_index;
     int off_read;
@@ -51,6 +51,7 @@ typedef struct _so_file{
 
     int firstIndex;
     int lastIndex;
+    int bufsizeIndex;
 
     int read_flag;
 
@@ -63,6 +64,11 @@ typedef struct _so_file{
 
     int is_p;
     int childFlag;
+
+    int is_file;
+    int flagERR;
+
+    int eof;
 } SO_FILE;
 
 FUNC_DECL_PREFIX SO_FILE *so_fopen(const char *pathname, const char *mode);
