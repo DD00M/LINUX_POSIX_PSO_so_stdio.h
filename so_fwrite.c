@@ -11,6 +11,11 @@
 
 size_t so_fwrite(const void *ptr, size_t size, size_t nmemb, SO_FILE *stream)
 {
+    if (stream->prev == READprev){
+        stream->buffer_index = 0;
+        stream->off_written = 0;
+        memset(stream->buffer, 0, BUFSIZE);
+    }
     if (strcmp(stream->mode, "r") == 0){
         stream->isERR = 999;
         return 0;
@@ -41,6 +46,7 @@ size_t so_fwrite(const void *ptr, size_t size, size_t nmemb, SO_FILE *stream)
         s = size;
         do
         {
+            //printf("%d\n", aux[p]);
             so_fputc((int)aux[p], stream);
             p++;
         }while(--s);

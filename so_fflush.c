@@ -15,9 +15,13 @@ int so_fflush(SO_FILE *stream)
     {
         if (stream->off_written != 0)
         {
+            //printf("cucubau: %d %d\n", stream->off_written, stream->so_fd);
+            //printf("\n\n\nBUFFFER\n%s\n\n\n\n", stream->buffer);
             int d = write(stream->so_fd, stream->buffer, stream->off_written);
+            //printf("\n\n\n\n\ndata: %d %d\n\n\n\n\n", d, stream->off_written);
             if (d < 0)
             {
+                printf("a dat fail la write\n");
                 stream->isERR = 555;
                 return SO_EOF;
             }

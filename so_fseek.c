@@ -2,7 +2,9 @@
 
 int so_fseek(SO_FILE *stream, long offset, int whence){
     if (stream->prev == READprev){
-        so_fflush(stream);
+        stream->buffer_index = 0;
+        stream->off_written = 0;
+        memset(stream->buffer, 0, BUFSIZE);
     }
     if (stream->prev == WRITEprev){
         so_fflush(stream);

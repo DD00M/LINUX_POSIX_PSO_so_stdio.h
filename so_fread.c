@@ -21,7 +21,8 @@ size_t so_fread(void *ptr, size_t size, size_t nmemb, SO_FILE *stream){
     }
     
     if (strcmp(stream->mode, "a+") == 0){
-        lseek(stream->so_fd, 0, SEEK_END);
+        //printf("here i am master\n");
+        //lseek(stream->so_fd, 0, SEEK_END);
     }
 
     if (nmemb <= 0 || size <= 0){
@@ -42,12 +43,15 @@ size_t so_fread(void *ptr, size_t size, size_t nmemb, SO_FILE *stream){
     if (size*nmemb >= stream->so_sizeFile){
        lala = stream->so_sizeFile;
     }else {lala = size * nmemb; }
+    //printf("lala: %d", lala);
     //printf("SIZEFILE: %d\n", stream->so_sizeFile);
     while (i < lala)
     {
         //for (int j = 0; j < size; j++){
             c = so_fgetc(stream);
+            //printf("%c", c);
             if (c == SO_EOF && stream->flagERR == -1){
+                    //printf("i/size: %d", i/size);
                 return i / size;
             }
             aux[p] = (char)c;
@@ -62,5 +66,8 @@ size_t so_fread(void *ptr, size_t size, size_t nmemb, SO_FILE *stream){
     stream->prev = READprev;
             //printf("a intrat si aici3\n");  
             //printf("XXXXXXX: %d\n", size*nmemb);
+
+
+
     return i / size;
 }

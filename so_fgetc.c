@@ -12,7 +12,7 @@
 int so_fgetc(SO_FILE *stream)
 {
     if (stream == NULL){
-        return NULL;
+        return SO_EOF;
     }
     if (strcmp(stream->mode, "w") == 0){
         return SO_EOF;

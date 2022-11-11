@@ -337,7 +337,7 @@ SO_FILE *so_fopen(const char *pathname, const char *mode)
         }
         else
         {
-            int fd = open(pathname, O_APPEND | O_WRONLY | O_CREAT, 0644);
+            int fd = open(pathname, O_APPEND | O_WRONLY |O_CREAT, 0644);
             if (fd == -1)
             {
                 free(fp);
@@ -385,7 +385,7 @@ SO_FILE *so_fopen(const char *pathname, const char *mode)
         fp->buffer_index = 0;
         if (access(pathname, F_OK) == 0)
         {
-            int fd = open(pathname, O_APPEND);
+            int fd = open(pathname, O_APPEND | O_RDWR);
             if (fd == -1)
             {
                 free(fp);
@@ -424,7 +424,7 @@ SO_FILE *so_fopen(const char *pathname, const char *mode)
         }
         else
         {
-            int fd = open(pathname, O_APPEND | O_CREAT, 0644);
+            int fd = open(pathname, O_APPEND | O_RDWR | O_CREAT, 0644);
             if (fd == -1)
             {
                 free(fp);

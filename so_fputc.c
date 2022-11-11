@@ -24,6 +24,7 @@ int so_fputc(int c, SO_FILE *stream)
     }
 
     stream->prev = WRITEprev;
+    //printf("\noff written din fputc: %d\n\n", stream->off_written);
 
     if (stream->off_written == BUFSIZE){
         so_fflush(stream);
@@ -32,6 +33,7 @@ int so_fputc(int c, SO_FILE *stream)
     stream->buffer[stream->buffer_index] = (int)c;
 
     stream->off_written+=1;
+    //printf("stream->offwritten: %d\n", stream->off_written);
     stream->buffer_index+=1;   
     stream->cursor+=1; 
     return c;
