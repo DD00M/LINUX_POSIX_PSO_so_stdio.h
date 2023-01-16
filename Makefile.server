@@ -1,0 +1,5 @@
+.PHONY: clean
+server: server.c
+	gcc server.c -o server -pthread
+clean: server 
+	rm server 
